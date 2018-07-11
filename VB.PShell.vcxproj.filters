@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Файлы заголовков\interpret">
+      <UniqueIdentifier>{939d326a-488b-4a08-a7d3-101d05a8ad0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\parse">
+      <UniqueIdentifier>{68cc01bf-68c9-45dd-aeb1-798ce3a88f95}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -20,6 +26,12 @@
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="parse.h">
+      <Filter>Файлы заголовков\parse</Filter>
+    </ClInclude>
+    <ClInclude Include="interpret.h">
+      <Filter>Файлы заголовков\interpret</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
