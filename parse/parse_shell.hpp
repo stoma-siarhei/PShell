@@ -2,6 +2,9 @@
 #include <array>
 #include <vector>
 #include <unordered_map>
+#include <algorithm>
+#include <functional>
+#include <string_view>
 #include <filesystem>
 
 
@@ -40,26 +43,25 @@ public:
 		}
 	}
 protected:
-	wstring& get() const
+	wstring& get()
 	{
-		if (!shell_str.empty())
+		if (shell_str.empty())
 		{
-			return shell_str;
-		}
-
-		for (wstring & str : shell)
-		{
-			shell_str += str;
-			shell_str += '\n';
+			concat();
 		}
 
 		return shell_str;
 	}
-	wstring& operator[](const int _index) const
-	{
 
+	const wstring get(const int _index) const
+	{
+		return shell[_index];
 	}
 private:
+	void concat()
+	{
+		for_each(shell.begin(), shell.end(), [&](wstring_view str) { shell_str += str; shell_str += '\n'; });
+	}
 	int count;
 	wstring shell_str;
 	vector<wstring> shell;
@@ -76,19 +78,31 @@ struct equal_to
 const array<wstring, 3> keys = { L"-m", L"-f", L"-arg" };
 
 template <class _Type>
+#ifdef _UNICODE
 class SerializeParam : public ShellParam<wchar_t**>
+#else
+class SerializeParam : public ShellParam<char**>
+#endif // _UNICODE
 {
 public:
+#ifdef _UNICODE
 	SerializeParam(_Type arg, int _count) : ShellParam<wchar_t**>::ShellParam(arg, _count)
+#else
+	SerializeParam(_Type arg, int _count) : ShellParam<char**>::ShellParam(arg, _count)
+#endif // _UNICODE
 	{
 	}
 
-	wstring& get_shell()
+	wstring& get_shell() 
 	{
 		return get();
 	}
 private:
-	unordered_map<wstring, wstring, hash<wstring>, equal_to> map_param;
+	wstring path_exe;
+	wstring path_module;
+	wstring name_module;
+	wstring name_function;
+	array<wstring, 10> params;
 };
 
 } // parse
