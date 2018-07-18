@@ -2,6 +2,7 @@
 #define _PARSE_H_
 
 
+#include "parse\parse_exeption.hpp"
 #include "parse\parse_shell.hpp"
 
 

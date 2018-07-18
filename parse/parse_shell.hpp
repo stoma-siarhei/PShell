@@ -1,6 +1,7 @@
 #include <string>
 #include <array>
 #include <vector>
+#include <tuple>
 #include <unordered_map>
 #include <algorithm>
 #include <functional>
@@ -33,7 +34,7 @@ public:
 			shell.push_back(wstring(*_ptr));
 		}
 	}
-
+	
 	ShellParam(char** _ptr, int _count) : count(_count)
 	{
 		for (int i = 0; i < count; i++, _ptr++)
@@ -57,6 +58,11 @@ protected:
 	{
 		return shell[_index];
 	}
+
+	int get_count()
+	{
+		return count;
+	}
 private:
 	void concat()
 	{
@@ -75,7 +81,13 @@ struct equal_to
 	}
 };
 
-const array<wstring, 3> keys = { L"-m", L"-f", L"-arg" };
+tuple<wstring, wstring> get_path_name(wstring_view wstr)
+{
+	path _path = wstr.data();
+	return std::make_tuple(_path.root_path(), _path.filename());
+}
+
+const array<wstring, 3> keys = { L"-m", L"-f", L"-a" };
 
 template <class _Type>
 #ifdef _UNICODE
@@ -91,18 +103,70 @@ public:
 	SerializeParam(_Type arg, int _count) : ShellParam<char**>::ShellParam(arg, _count)
 #endif // _UNICODE
 	{
+		if (!serialize() || 1)
+		{
+			throw SerializeParamExcept(get());
+		}
 	}
 
 	wstring& get_shell() 
 	{
 		return get();
 	}
+protected:
+	bool serialize()
+	{
+		for (int i = 0, _size = get_count(); i < _size; i++)
+		{
+			wstring wstr = get(i);
+			if (i == 0) 
+			{
+				tie(path_exe, name_exe) = get_path_name(wstr);
+			}
+			else
+			{
+				static int _command;
+				if (wstr.size() == 2 && wstr[0] == L'-')
+				{
+					_command = find(keys.begin(), keys.end(), wstr) - keys.begin();
+					continue;
+				}
+				switch (_command)
+				{
+				case (0) :
+					{
+						path _path = wstr;
+						name_module = _path.filename();
+						path_module.push_back(_path.root_path());
+					}
+					break;
+				case (1) :
+					name_function = wstr;
+					break;
+				case (2) :
+					{
+						array<wstring, 10>::iterator it = find(params.begin(), params.end(), L"");
+						if (it == params.end())
+						{
+							return false;
+						}
+						*it = wstr;
+					}
+					break;
+				default :
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 private:
 	wstring path_exe;
-	wstring path_module;
+	vector<wstring> path_module;
+	wstring name_exe;
 	wstring name_module;
 	wstring name_function;
-	array<wstring, 10> params;
+	array<wstring, 10> params = { L"", L"", L"", L"", L"", L"", L"", L"", L"", L"" };
 };
 
 } // parse
