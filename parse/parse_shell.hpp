@@ -84,7 +84,7 @@ struct equal_to
 tuple<wstring, wstring> get_path_name(wstring_view wstr)
 {
 	path _path = wstr.data();
-	return std::make_tuple(_path.root_path(), _path.filename());
+	return std::make_tuple(_path.parent_path(), _path.filename());
 }
 
 const array<wstring, 3> keys = { L"-m", L"-f", L"-a" };
@@ -103,9 +103,9 @@ public:
 	SerializeParam(_Type arg, int _count) : ShellParam<char**>::ShellParam(arg, _count)
 #endif // _UNICODE
 	{
-		if (!serialize() || 1)
+		if (!serialize())
 		{
-			throw SerializeParamExcept(get());
+			throw SerializeParamExcept(get(), path_exe);
 		}
 	}
 
