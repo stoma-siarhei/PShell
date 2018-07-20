@@ -5,15 +5,12 @@
 #include <unordered_map>
 #include <algorithm>
 #include <functional>
-#include <string_view>
-#include <filesystem>
 
 
 namespace parse
 {
 
 using namespace std;
-using namespace std::experimental::filesystem;
 
 template <class _Type>
 class ShellParam
@@ -66,28 +63,12 @@ protected:
 private:
 	void concat()
 	{
-		for_each(shell.begin(), shell.end(), [&](wstring_view str) { shell_str += str; shell_str += '\n'; });
+		for_each(shell.begin(), shell.end(), [&](wstring_view str) { shell_str += str; shell_str += ' '; });
 	}
 	int count;
 	wstring shell_str;
 	vector<wstring> shell;
 };
-
-struct equal_to
-{
-	bool operator()(const wstring& lhs, const wstring& rhs) const
-	{
-		return lhs == rhs;
-	}
-};
-
-tuple<wstring, wstring> get_path_name(wstring_view wstr)
-{
-	path _path = wstr.data();
-	return std::make_tuple(_path.parent_path(), _path.filename());
-}
-
-const array<wstring, 3> keys = { L"-m", L"-f", L"-a" };
 
 template <class _Type>
 #ifdef _UNICODE
@@ -105,8 +86,13 @@ public:
 	{
 		if (!serialize())
 		{
-			throw SerializeParamExcept(get(), path_exe);
+			wstring res = parse::utils::concat_s(L"\n", path_exe, name_exe, wstring(L"\tPath Python:"), 
+				parse::utils::concat_integral(path_module, L"\n"),
+				name_module, name_function, 
+				parse::utils::concat_integral<wstring, 10, wchar_t const [2]>(params, L"\t"));
+			throw SerializeParamExcept(get(), res);
 		}
+		for_each(begin(path_python), end(path_python), [&](const wstring& _path) { path_module.push_back(parse::utils::concat(path_exe, _path)); });
 	}
 
 	wstring& get_shell() 
@@ -121,11 +107,11 @@ protected:
 			wstring wstr = get(i);
 			if (i == 0) 
 			{
-				tie(path_exe, name_exe) = get_path_name(wstr);
+				tie(path_exe, name_exe) = parse::utils::get_path_name(wstr);
 			}
 			else
 			{
-				static int _command;
+				static int _command = -1;
 				if (wstr.size() == 2 && wstr[0] == L'-')
 				{
 					_command = find(keys.begin(), keys.end(), wstr) - keys.begin();
@@ -135,13 +121,15 @@ protected:
 				{
 				case (0) :
 					{
-						path _path = wstr;
-						name_module = _path.filename();
-						path_module.push_back(_path.root_path());
+						auto[_1, _2] = parse::utils::get_path_name(wstr);
+						name_module = _2;
+						path_module.push_back(_1);
+						_command = -1;
 					}
 					break;
 				case (1) :
 					name_function = wstr;
+					_command = -1;
 					break;
 				case (2) :
 					{
