@@ -19,6 +19,9 @@
     <Filter Include="Файлы заголовков\parse">
       <UniqueIdentifier>{68cc01bf-68c9-45dd-aeb1-798ce3a88f95}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\interpret">
+      <UniqueIdentifier>{67c2555b-7dcb-4d6a-9316-0d7156499e8f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -40,6 +43,9 @@
     </ClCompile>
     <ClCompile Include="VB.PShell.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="interpret.cpp">
+      <Filter>Исходные файлы\interpret</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

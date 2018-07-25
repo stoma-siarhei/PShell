@@ -13,7 +13,7 @@ using namespace std;
 class SerializeParamExcept : public invalid_argument
 {
 public:
-	SerializeParamExcept() : invalid_argument("")
+	SerializeParamExcept() noexcept : invalid_argument("")
 	{
 	}
 

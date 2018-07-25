@@ -99,6 +99,26 @@ public:
 	{
 		return get();
 	}
+
+	vector<wstring>& get_path_module()
+	{
+		return path_module;
+	}
+
+	wstring& get_name_module()
+	{
+		return name_module;
+	}
+
+	wstring& get_name_function()
+	{
+		return name_function;
+	}
+
+	array<wstring, 10>& get_params()
+	{
+		return params;
+	}
 protected:
 	bool serialize()
 	{

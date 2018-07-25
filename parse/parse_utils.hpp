@@ -36,7 +36,7 @@ auto concat_s(const _Symbol& symbol, const _Type& ... arg)
 }
 
 template <class _Type, size_t N, class _Symbol>
-auto concat_integral(std::array<_Type, N>& mass, _Symbol& symbol)
+inline auto concat_integral(std::array<_Type, N>& mass, _Symbol& symbol)
 {
 	std::wstring res;
 	for_each(begin(mass), end(mass), [&](_Type& data) { res = concat(res, concat_s(symbol, convert_to(data))); });
@@ -44,7 +44,7 @@ auto concat_integral(std::array<_Type, N>& mass, _Symbol& symbol)
 }
 
 template <class _Type, class _Symbol>
-auto concat_integral(std::vector<_Type>& mass, _Symbol& symbol)
+inline auto concat_integral(std::vector<_Type>& mass, _Symbol& symbol)
 {
 	std::wstring res;
 	for_each(begin(mass), end(mass), [&](_Type& data) { res = concat(res, concat_s(symbol, convert_to(data))); });
@@ -59,7 +59,7 @@ struct equal_to
 	}
 };
 
-tuple<wstring, wstring> get_path_name(wstring_view wstr)
+inline tuple<wstring, wstring> get_path_name(wstring_view wstr)
 {
 	using namespace std::experimental::filesystem;
 

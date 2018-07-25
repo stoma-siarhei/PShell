@@ -1,8 +1,22 @@
 #ifndef _INTERPRET_H_
 #define _INTERPRET_H_
 
+#include "parse.h"
 
-#include "interpret\py_command.h"
+#include <string>
+#include <array>
+#include <algorithm>
+
+
+bool initialize(parse::SerializeParam<wchar_t**>&);
+
+bool set_arguments(std::array<std::wstring, 10>&, size_t);
+
+bool set_function(std::wstring&);
+
+bool set_module(std::wstring&);
+
+bool uninitilize();
 
 
 #endif // _INTERPRET_H_
