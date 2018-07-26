@@ -6,6 +6,7 @@
 #include <string>
 #include <array>
 #include <algorithm>
+#include <functional>
 
 
 bool initialize(parse::SerializeParam<wchar_t**>&);
