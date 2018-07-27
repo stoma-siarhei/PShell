@@ -16,18 +16,28 @@ bool initialize(parse::SerializeParam<wchar_t**>& serialize)
 	return true;
 }
 
+struct compare_ch
+{
+	bool operator()(wchar_t a, wchar_t b)
+	{
+		return a == b;
+	}
+};
+
 PyObject *parse_type_arg(std::wstring& wstr)
 {
-	if (std::any_of(begin(wstr) + 1, end(wstr), [](wchar_t& ch) { return ch == L'-'; }) ||
-		std::any_of(begin(wstr), end(wstr), [](wchar_t& ch) { return ch == L'.'; }) ||
-		count_if(begin(wstr), end(wstr), [](wchar_t& ch) { return ch == L'.'; }) > 1)
+	using std::placeholders::_1;
+	
+	if (std::any_of(begin(wstr) + 1, end(wstr), std::bind(compare_ch(), _1, L'.')) ||
+		std::any_of(begin(wstr), end(wstr), std::bind(compare_ch(), _1, L'.')) ||
+		count_if(begin(wstr), end(wstr), std::bind(compare_ch(), _1, L'.')) > 1)
 	{
 		return PyUnicode_FromWideChar(wstr.c_str(), wstr.length());
 	}
 
 	for (auto it : wstr)
 	{
-		if (it < 0x30 && it > 0x39)
+		if (it < 0x30 || it > 0x39)
 		{
 			return PyUnicode_FromWideChar(wstr.c_str(), wstr.length());
 		}
@@ -53,6 +63,7 @@ struct ParseArg
 	{
 		PyObject *obj = parse_type_arg(wstr);
 		PyTuple_SetItem(object.get(), it, obj);
+		it++;
 	}
 };
 
@@ -73,7 +84,7 @@ bool set_function(std::wstring& name)
 	std::string str(begin(name), end(name));
 	py_Func = PyObject_GetAttrString(py_Module, str.c_str());
 
-	return py_Func != nullptr;// && PyCallable_Check(py_Func);
+	return py_Func != nullptr && PyCallable_Check(py_Func);
 }
 
 bool set_module(std::wstring& name)
@@ -82,6 +93,16 @@ bool set_module(std::wstring& name)
 	py_Module = PyImport_Import(_name);
 	Py_DECREF(_name);
 	return py_Module != nullptr;
+}
+
+void run()
+{
+	PyObject *value = PyObject_CallObject(py_Func, py_Args);
+	if (value != nullptr)
+	{
+		printf("Result of call: %ld\n", PyLong_AsLong(value));
+		Py_DECREF(value);
+	}
 }
 
 bool uninitilize()

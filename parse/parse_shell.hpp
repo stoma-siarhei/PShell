@@ -143,6 +143,10 @@ protected:
 					{
 						auto[_1, _2] = parse::utils::get_path_name(wstr);
 						name_module = _2;
+						if (name_module.find(L".py") != wstring::npos)
+						{
+							name_module.erase(name_module.find(L".py"));
+						}
 						path_module.push_back(_1);
 						_command = -1;
 					}

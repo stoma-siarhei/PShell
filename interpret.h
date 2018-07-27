@@ -17,6 +17,8 @@ bool set_function(std::wstring&);
 
 bool set_module(std::wstring&);
 
+void run();
+
 bool uninitilize();
 
 
