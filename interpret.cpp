@@ -18,7 +18,7 @@ bool initialize(parse::SerializeParam<wchar_t**>& serialize)
 
 struct compare_ch
 {
-	bool operator()(wchar_t a, wchar_t b)
+	bool operator()(const wchar_t& a, const wchar_t& b) const
 	{
 		return a == b;
 	}
@@ -30,7 +30,7 @@ PyObject *parse_type_arg(std::wstring& wstr)
 	
 	if (std::any_of(begin(wstr) + 1, end(wstr), std::bind(compare_ch(), _1, L'.')) ||
 		std::any_of(begin(wstr), end(wstr), std::bind(compare_ch(), _1, L'.')) ||
-		count_if(begin(wstr), end(wstr), std::bind(compare_ch(), _1, L'.')) > 1)
+		std::count_if(begin(wstr), end(wstr), std::bind(compare_ch(), _1, L'.')) > 1)
 	{
 		return PyUnicode_FromWideChar(wstr.c_str(), wstr.length());
 	}
@@ -95,13 +95,35 @@ bool set_module(std::wstring& name)
 	return py_Module != nullptr;
 }
 
+int filter(unsigned int code, struct _EXCEPTION_POINTERS *ep)
+{
+	fprintf(stderr, "in filter.");
+	if (code == EXCEPTION_ACCESS_VIOLATION)
+	{
+		fprintf(stderr, "caught AV as expected.");
+		return EXCEPTION_EXECUTE_HANDLER;
+	}
+	else
+	{
+		fprintf(stderr, "didn't catch AV, unexpected.");
+		return EXCEPTION_CONTINUE_SEARCH;
+	};
+}
+
 void run()
 {
-	PyObject *value = PyObject_CallObject(py_Func, py_Args);
-	if (value != nullptr)
+	__try
 	{
-		printf("Result of call: %ld\n", PyLong_AsLong(value));
-		Py_DECREF(value);
+		PyObject *value = PyObject_CallObject(py_Func, py_Args);
+		if (value != nullptr)
+		{
+			printf("Result of call: %ld\n", PyLong_AsLong(value));
+			Py_DECREF(value);
+		}
+	}
+	__except (filter(GetExceptionCode(), GetExceptionInformation()))
+	{
+		fprintf(stderr, "Except.\n");
 	}
 }
 

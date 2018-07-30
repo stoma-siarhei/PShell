@@ -8,6 +8,10 @@
 #include <algorithm>
 #include <functional>
 
+#include <stdio.h>
+#include <Windows.h>
+#include <excpt.h>
+
 
 bool initialize(parse::SerializeParam<wchar_t**>&);
 
