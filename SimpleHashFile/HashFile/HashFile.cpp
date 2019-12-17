@@ -1,6 +1,11 @@
 ﻿#include "pch.h"
 
 
-void fnHashFile()
+namespace vba::hash
 {
+
+void HashFile()
+{
+}
+
 }
